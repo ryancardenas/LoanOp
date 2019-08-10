@@ -8,12 +8,12 @@ def compound(p, r, dt, n='daily'):
     elif n == 'annualy':
         m = 1
     else:
-        return p * np.exp(r * dt)
-    return p * (1 + r / m) ** (m * dt)
+        return p * np.exp(r * dt / 12)
+    return p * (1 + r / m) ** (m * dt / 12)
 
 
-def getMinPayment(princ, r, t=10, compounding='daily'):
-    payment = compound(princ, r, t, n=compounding) / (12 * t)
+def getMinPayment(princ, r, t=120, compounding='daily'):
+    payment = compound(princ, r, t, n=compounding) / t
 
     while True:
         payment_old = payment
@@ -22,7 +22,7 @@ def getMinPayment(princ, r, t=10, compounding='daily'):
                                      term=t, n=compounding)
 
         if abs(p) > 0.01:
-            payment += p / (12 * t)
+            payment += p / t
         else:
             break
 
@@ -42,10 +42,10 @@ def loadLoanCSV(filename, cols=None, skiprow=0):
     return loans
 
 
-def simulateMonthlyRepayment(payment, p, r, term=10, n='daily'):
+def simulateMonthlyRepayment(payment, p, r, term=120, n='daily'):
     m = 0
-    while m < (12 * term):
-        p = compound(p, r, 1/12, n='daily')
+    while m < term:
+        p = compound(p, r, 1, n='daily')
         p -= payment
         m += 1
     return p
