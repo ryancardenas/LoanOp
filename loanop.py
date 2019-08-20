@@ -13,13 +13,14 @@ def compound(p, r, dt, n='daily'):
 
 
 def getMinPayment(princ, r, t=120, compounding='daily'):
+    # Calculate total after compounding
     payment = compound(princ, r, t, n=compounding) / t
 
     while True:
         payment_old = payment
 
         p = simulateMonthlyRepayment(payment, princ, r,
-                                     term=t, n=compounding)
+                                     term=t, compounding=compounding)
 
         if abs(p) > 0.01:
             payment += p / t
@@ -42,10 +43,10 @@ def loadLoanCSV(filename, cols=None, skiprow=0):
     return loans
 
 
-def simulateMonthlyRepayment(payment, p, r, term=120, n='daily'):
+def simulateMonthlyRepayment(payment, p, r, term=120, compounding='daily'):
     m = 0
     while m < term:
-        p = compound(p, r, 1, n='daily')
+        p = compound(p, r, 1, n=compounding)
         p -= payment
         m += 1
     return p
